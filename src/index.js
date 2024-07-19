@@ -189,12 +189,12 @@ export default function install (Vue, setupOptions = {}) {
       if (typeof options.onLoadError === 'function') {
         options.onLoadError(error)
       } else if (error.target) {
-        return console.error(
+        console.error(
           `[vue-matomo] An error occurred trying to load ${error.target.src}. ` +
           'If the file exists you may have an ad- or trackingblocker enabled.'
         )
+      } else {
+        console.error(error)
       }
-
-      console.error(error)
     })
 }

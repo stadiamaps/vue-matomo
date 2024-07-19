@@ -17,7 +17,8 @@ const defaultOptions = {
   cookieDomain: undefined,
   domains: undefined,
   preInitActions: [],
-  crossOrigin: undefined
+  crossOrigin: undefined,
+  onLoadError: undefined
 }
 
 export const matomoKey = 'Matomo'
@@ -193,5 +194,9 @@ export default function install (Vue, setupOptions = {}) {
       }
 
       console.error(error)
+
+      if (options.onLoadError) {
+        options.onLoadError(error)
+      }
     })
 }

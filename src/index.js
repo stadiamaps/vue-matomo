@@ -186,7 +186,9 @@ export default function install (Vue, setupOptions = {}) {
     .then(() => piwikExists())
     .then(() => initMatomo(Vue, options))
     .catch((error) => {
-      if (error.target) {
+      if (typeof options.onLoadError === 'function') {
+        options.onLoadError(error)
+      } else if (error.target) {
         return console.error(
           `[vue-matomo] An error occurred trying to load ${error.target.src}. ` +
           'If the file exists you may have an ad- or trackingblocker enabled.'
@@ -194,9 +196,5 @@ export default function install (Vue, setupOptions = {}) {
       }
 
       console.error(error)
-
-      if (options.onLoadError) {
-        options.onLoadError(error)
-      }
     })
 }

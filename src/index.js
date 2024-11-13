@@ -1,5 +1,4 @@
 import { getMatomo, getResolvedHref, loadScript } from './utils'
-import { nextTick } from 'vue'
 
 const defaultOptions = {
   debug: false,
@@ -75,6 +74,16 @@ function trackMatomoPageView (options, to, from) {
   Matomo.trackPageView(title)
 }
 
+// Forces waiting for the next DOM update.
+// This is the only way to reliably ensure that the view has rendered,
+// which is in turn the only way to ensure correct heatmap snapshots
+// after navigation.
+const doubleRequestAnimationFrame = (callback) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(callback)
+  })
+}
+
 function initMatomo (Vue, options) {
   const Matomo = getMatomo()
 
@@ -96,7 +105,7 @@ function initMatomo (Vue, options) {
       : options.router.currentRoute
 
     // Register first page view
-    nextTick(() => {
+    doubleRequestAnimationFrame(() => {
       trackUserInteraction(options, currentRoute)
     })
   }
@@ -104,7 +113,7 @@ function initMatomo (Vue, options) {
   // Track page navigations if router is specified
   if (options.router) {
     options.router.afterEach((to, from) => {
-      nextTick(() => {
+      doubleRequestAnimationFrame(() => {
         trackUserInteraction(options, to, from)
 
         if (options.enableLinkTracking) {

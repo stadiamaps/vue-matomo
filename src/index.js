@@ -1,4 +1,5 @@
 import { getMatomo, getResolvedHref, loadScript } from './utils'
+import { nextTick } from 'vue'
 
 const defaultOptions = {
   debug: false,
@@ -95,17 +96,21 @@ function initMatomo (Vue, options) {
       : options.router.currentRoute
 
     // Register first page view
-    trackUserInteraction(options, currentRoute)
+    nextTick(() => {
+      trackUserInteraction(options, currentRoute)
+    })
   }
 
   // Track page navigations if router is specified
   if (options.router) {
     options.router.afterEach((to, from) => {
-      trackUserInteraction(options, to, from)
+      nextTick(() => {
+        trackUserInteraction(options, to, from)
 
-      if (options.enableLinkTracking) {
-        Matomo.enableLinkTracking()
-      }
+        if (options.enableLinkTracking) {
+          Matomo.enableLinkTracking()
+        }
+      })
     })
   }
 }
